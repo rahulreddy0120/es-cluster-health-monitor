@@ -1,0 +1,39 @@
+# How often to re-run checks (0 = run once and exit)
+check_interval_seconds: 300
+
+clusters:
+  - name: production-logs
+    endpoint: https://es-prod-logs.internal:9200
+    timeout: 30
+    auth:
+      type: aws_iam
+      region: us-east-1
+    thresholds:
+      heap_percent: 85
+      disk_watermark_percent: 80
+      unassigned_shards: 0
+      indexing_latency_ms: 100
+      search_latency_ms: 500
+      total_shard_count: 1000
+
+  - name: production-metrics
+    endpoint: https://es-prod-metrics.internal:9200
+    timeout: 30
+    auth:
+      type: basic
+      username_env: ES_METRICS_USER
+      password_env: ES_METRICS_PASS
+    thresholds:
+      heap_percent: 80
+      disk_watermark_percent: 75
+      unassigned_shards: 0
+      indexing_latency_ms: 50
+      total_shard_count: 800
+
+alerts:
+  slack:
+    webhook_url_env: SLACK_WEBHOOK_URL
+    channel: "#es-alerts"
+  sns:
+    topic_arn_env: SNS_TOPIC_ARN
+    region: us-east-1
